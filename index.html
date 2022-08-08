@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUGAMOS DADOS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            text-align: center;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            background-image: url(https://data2.1freewallpapers.com/download/game-dice-casino.jpg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .contenedor {
+            text-align: center;
+            max-width: 440px;
+            margin: auto;
+            margin-top: 100px;
+            padding: 20px;
+            border: 1px solid rgb(3, 104, 12);
+            box-shadow: 0px 0px 25px 5px rgb(3, 104, 12);
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        li {
+            text-align: left;
+            text-decoration: none;
+            list-style-type: none;
+            margin: 10px;
+        }
+
+        .etiquetas {
+            display: inline-block;
+            width: 240px;
+        }
+
+        input[type=button] {
+            width: 200px;
+            height: 50px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .aLanzar {
+            font-size: 1.5em;
+            background-color: rgb(12, 74, 136);
+            color: white;
+        }
+
+        .lanzado {
+            background-image: url(https://www.gifsanimados.org/data/media/710/dado-imagen-animada-0085.gif);
+            background-color: black;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            color: transparent;
+        }
+
+        #resultado, #salio{
+            text-align: center;
+            font-weight: bolder;
+            font-size: 1.5em;
+            width: 170px;
+        }
+        .ganaste {
+            background-color: blue;
+            color: white;
+        }
+
+        .perdiste {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="contenedor">
+        <h1>Jugamos Dados</h1>
+        <br>
+        <p id="saldo">Tenés un total de <b>$500</b> para jugar. No hay mínimo.</p>
+        <br><br>
+        <li>
+            <label for="importe" class="etiquetas">Apuesta $: </label>
+            <input type="number" name="importe" id="importe">
+        </li>
+        <li>
+            <label for="valorDado" class="etiquetas">Número apostado (1 al 6):</label>
+            <input type="number" name="valorDado" id="valorDado" step="1" max="6" min="1">
+        </li>
+        <input type="button" id="lanzo" value="Lanzo" class="aLanzar">
+        <div id="resultadoFinal">
+            <li>
+                <label for="salio" class="etiquetas">Salió el número:</label>
+                <input type="text" name="salio" id="salio" disabled>
+            </li>
+            <li>
+                <label for="resultado" class="etiquetas">Resultado:</label>
+                <input type="text" name="resultado" id="resultado" disabled>
+            </li>
+            <br>
+            <input type="button" value="Sigo jugando..." id="sigoJugando" disabled>
+            <input type="button" value="Me retiro" id="meRetiro">
+        </div>
+
+    </div>
+    <script>
+        document.querySelector("#lanzo").setAttribute("onclick", "proceso()");
+        let saldo = 500;
+
+        function proceso() {
+            detenerCambioDeColor();
+            let apuesta = document.querySelector("#importe").value;
+            console.log(apuesta)
+            //VALIDAMOS LOS DATOS INGRESADOS
+            if (apuesta > saldo || apuesta <= 0) {
+                alert("La apuesta no puede ser superior al saldo, ni cero o negativo");
+                document.querySelector("#importe").focus();
+                return;
+            }
+            let numeroDado = parseInt(document.querySelector("#valorDado").value);
+            console.log(numeroDado);
+            if (numeroDado < 1 || numeroDado > 6 || isNaN(numeroDado)) {
+                alert("El número del dado debe ser entre 1 y 6");
+                document.querySelector("#valorDado").focus();
+                return;
+            }
+            //ESTANDO TODO CORRECTO, DESHABILITAMOS LOS DOS INPUTS Y EL BOTÓN
+            document.querySelector("#importe").disabled = true;
+            document.querySelector("#valorDado").disabled = true;
+            document.querySelector("#lanzo").disabled = true;
+            //QUITAMOS AL BOTÓN DE LANZAR, LA CLASE aLanzar QUE MANEJA EL TEXTO DEL MISMO
+            document.querySelector("#lanzo").classList.remove("aLanzar");
+            //Y LE ASIGNAMOS LA CLASE lanzado, QUE MANEJA UN GIF ANIMADO DE FONDO
+            document.querySelector("#lanzo").classList.add("lanzado");
+            //LANZAMOS EL DADO.
+            //MATH.RANDOM() GENERA UN VALOR AL AZAR ENTRE 0(INCLUÍDO) HASTA 1(NO INCLUIDO)
+            //LO MULTIPLICAMOS POR 6 PARA QUE NOS DE UN VALOR ENTRE 0 Y 5,94(0,99 * 6)
+            //Y LE SUMAMOS 1 PARA QUE SALGA DEL 0 Y LLEGUE HASTA 6,94
+            //MATH.FLOOR() DEVUELVE EL MÁXIMO ENTERO MENOR O IGUAL AL NÚMERO, CON LO CUAL
+            //OBTENDREMOS UN NÚMERO ENTRE 1 Y 6
+            let valorAlAzar = Math.floor(Math.random() * 6) + 1;
+            console.log("salió: ", valorAlAzar);
+            document.querySelector("#salio").value = valorAlAzar;
+
+            //campoResultado es el input para indicar el resultado de la apuesta
+            let campoResultado = document.querySelector("#resultado");
+            if (valorAlAzar === numeroDado) {
+                campoResultado.value = "GANASTE!!!";
+                //SI GANÓ LE ASIGANAMOS ESTILO DE WINNER
+                campoResultado.classList.add('ganaste');
+                campoResultado.classList.remove("perdiste");
+                cambiaDeColor();
+                //SUMAMOS A LOS 500
+                saldo += apuesta * 2;
+            } else {
+                campoResultado.value = "PERDISTE!!!"
+                //SI NO, LE ASIGNAMOS ESTILO DE LOSER
+                campoResultado.classList.add("perdiste");
+                campoResultado.classList.remove("ganaste");
+                //cambiaDeColor() FUNCIÓN QUE ASIGNA UN INTERVALO PARA EL TEXTO Y COLOR DE FONDO
+                cambiaDeColor();
+                //RESTAMOS DE LOS 500
+                saldo -= apuesta;
+            }
+            document.querySelector("#saldo").innerHTML = `Tenés un total de <b>$${saldo}</b> para jugar. No hay mínimo.`;
+            //HABILITAMOS EL BOTÓN SIGO JUGANDO
+            document.querySelector("#sigoJugando").disabled = false;
+        }
+        //VEMOS QUE HACE EL BOTON SIGO JUGANDO
+        document.querySelector("#sigoJugando").setAttribute("onclick", "sigoJugando()");
+        function sigoJugando() {
+            //CUANDO SIGUE JUGANDO DESHABILITA TAL BOTÓN Y HABILITA IMPORTE, APUESTA Y BOTÓN DE LANZAMIENTO
+            document.querySelector("#sigoJugando").disabled = true;
+            document.querySelector("#importe").disabled = false;
+            document.querySelector("#valorDado").disabled = false;
+            document.querySelector("#lanzo").disabled = false;
+            //LIMPIA EL NUMERO ANTERIOR Y EL RESULTADO
+            document.querySelector("#salio").value = "";
+            document.querySelector("#resultado").value = "";
+            //QUITA EL GIF DE FONDO EN EL BOTÓN DE LANZAR Y ASIGNA EL TEXTO
+            document.querySelector("#lanzo").classList.remove("lanzado");
+            document.querySelector("#lanzo").classList.add("aLanzar");
+            //VERIFICA SALDO
+            if (saldo <= 0) {
+                document.querySelector("#resultadoFinal").innerHTML = "<br>NO PODÉS SEGUIR JUGANDO, NO TENÉS SALDO";
+                document.querySelector("#lanzo").disabled = true;
+                document.querySelector("#importe").disabled = true;
+                document.querySelector("#valorDado").disabled = true;
+            }
+        }
+        //ESTABLECE DISPARO DE FUNCIÓN AL CLICKEAR meRetiro
+        document.querySelector("#meRetiro").setAttribute("onclick", "meRetiro()");
+
+        function meRetiro() {
+            //CARGA LA DIV CON TEXTO Y ANULA ACCIONES VARIAS
+            document.querySelector("#resultadoFinal").innerHTML = `<br>Te retirás con $${saldo}. Gracias por haber participado!!. Te esperamos!!!`;
+            //DESHABILITA ACCIONES
+            document.querySelector("#lanzo").disabled = true;
+            document.querySelector("#importe").disabled = true;
+            document.querySelector("#valorDado").disabled = true;
+        }
+
+        let intervalo = 0;
+        function cambiaDeColor() {
+            intervalo = setInterval(flasheaTexto, 1000);
+        }
+
+        function flasheaTexto() {
+            let elemento = document.querySelector('#resultado');
+            elemento.style.color = elemento.style.color == 'white' ? 'yellow' : 'white';
+        }
+
+        function detenerCambioDeColor() {
+            clearInterval(intervalo);
+        }
+    </script>
+
+</body>
+
+</html>
